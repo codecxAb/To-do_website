@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (taskText !== '') {
       addTask(taskText);
       inputBox.value = '';
+      saveTasks(); // Save tasks after adding a new one
     }
   });
 
@@ -20,14 +21,21 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // Event listener for marking/unmarking a task as checked
+  // Event listener for marking/unmarking a task as checked or deleting a task
   listContainer.addEventListener('click', function (event) {
     const target = event.target;
 
-    if (target.tagName === 'LI') {
-      target.classList.toggle('checked');
-    } else if (target.classList.contains('delete')) {
-      deleteTask(target.closest('li'));
+    if (target.tagName === 'LI' || target.classList.contains('delete')) {
+      const taskItem = target.closest('li');
+      const isDeleteButton = target.classList.contains('delete');
+
+      if (isDeleteButton) {
+        deleteTask(taskItem);
+      } else {
+        taskItem.classList.toggle('checked');
+      }
+
+      saveTasks(); // Save tasks after marking/unmarking or deleting
     }
   });
 
@@ -48,4 +56,20 @@ document.addEventListener('DOMContentLoaded', function () {
   function deleteTask(task) {
     listContainer.removeChild(task);
   }
+
+  // Function to save tasks to localStorage
+  function saveTasks() {
+    localStorage.setItem('tasks', listContainer.innerHTML);
+  }
+
+  // Function to load tasks from localStorage
+  function loadTasks() {
+    const savedTasks = localStorage.getItem('tasks');
+    if (savedTasks) {
+      listContainer.innerHTML = savedTasks;
+    }
+  }
+
+  // Load tasks when the page is loaded
+  loadTasks();
 });
